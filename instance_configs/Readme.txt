@@ -1,0 +1,1 @@
+This dir holds instnace configs in json format. Coming soon an example.
