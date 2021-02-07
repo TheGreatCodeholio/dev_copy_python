@@ -19,7 +19,6 @@ class UserInput:
             self.get_uuid()
             return
         self.settings_dict["tar_uuid"] = tar_uuid
-        # os.popen("cd instance_configs && wget --user=magemojo --ask-password -r -nH --cut-dirs=2 --no-parent --reject='index.html*' http://icarey.net/instance_configs")
         self.check_for_config()
 
     def check_for_config(self):
@@ -73,7 +72,6 @@ class UserInput:
         child = subprocess.Popen("mysql -h mysql -u " + self.settings_dict["tar_mysql_user"] + " -p'" + self.settings_dict["tar_mysql_password"] + "' " + self.settings_dict["tar_mysql_database"] + " -e 'select value from core_config_data where path like \"web/%secure/base_url\" AND scope=\"default\" LIMIT 1'", shell=True, stdout=subprocess.PIPE)
         streamdata = child.communicate()[0]
         rc = child.returncode
-        print(rc)
         if rc == 1:
             base_url = input(Colors.OKGREEN + "Target Base URL: " + Colors.ENDC)
             if not base_url.endswith('/'):
@@ -84,11 +82,10 @@ class UserInput:
                 self.settings_dict["tar_base_url"] = base_url
         else:
             self.settings_dict["tar_base_url"] = streamdata.decode('UTF-8').split('value')[1].replace('\n', '')
-            print(streamdata.decode('UTF-8').split('value')[1].replace('\n', ''))
         self.get_source_ssh_host()
 
     def get_source_ssh_host(self):
-        sou_ssh_host = input(Colors.OKGREEN + "SSH Host IP: " + Colors.ENDC)
+        sou_ssh_host = input(Colors.OKGREEN + "Source SSH Host IP: " + Colors.ENDC)
         try:
             ip_valid = [0 <= int(x) < 256 for x in
                         re.split('\.', re.match(r'^\d+\.\d+\.\d+\.\d+$', sou_ssh_host).group(0))].count(True) == 4
@@ -103,17 +100,17 @@ class UserInput:
             return
 
     def get_source_ssh_port(self):
-        sou_ssh_port = input(Colors.OKGREEN + "SSH Port: " + Colors.ENDC)
+        sou_ssh_port = input(Colors.OKGREEN + "Source SSH Port: " + Colors.ENDC)
         self.settings_dict["sou_ssh_port"] = sou_ssh_port
         self.get_source_ssh_user()
 
     def get_source_ssh_user(self):
-        sou_ssh_user = input(Colors.OKGREEN + "SSH User: " + Colors.ENDC)
+        sou_ssh_user = input(Colors.OKGREEN + "Source SSH User: " + Colors.ENDC)
         self.settings_dict["sou_ssh_user"] = sou_ssh_user
         self.get_source_public_html()
 
     def get_source_public_html(self):
-        sou_public_html = input(Colors.OKGREEN + "Remote public_html path: " + Colors.ENDC)
+        sou_public_html = input(Colors.OKGREEN + "Source public_html path: " + Colors.ENDC)
         if sou_public_html.endswith('/'):
             print(Colors.FAIL + "Path should not end with a /. Example /srv/public_html" + Colors.ENDC)
             self.get_source_public_html()
@@ -124,8 +121,6 @@ class UserInput:
 
     def save_json_config(self):
         print(Colors.OKGREEN + "Saving Config....." + Colors.ENDC)
-        print(self.settings_dict)
         with open("instance_configs/" + self.settings_dict["tar_uuid"] + ".json", 'w') as outfile:
             json.dump(self.settings_dict, outfile, indent=4)
             outfile.close()
-        # os.popen("rsync -Pav -e 'ssh -p 22' instance_configs/" + self.settings_dict["tar_uuid"] + ".json magemojo@play.icarey.net:~/")

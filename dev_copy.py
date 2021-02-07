@@ -24,7 +24,6 @@ def main():
     user_input = UserInput()
     # Put User Input in to a Dictionary
     settings_dict = user_input.settings_dict
-    print(Colors.OKGREEN + str(settings_dict) + Colors.ENDC)
     # Check for SSH Key, Generate is there isn't one, add path to the settings dict
     settings_dict["sou_ssh_privkey_path"] = ssh_key(settings_dict["sou_ssh_user"])
     # Read Public Key
